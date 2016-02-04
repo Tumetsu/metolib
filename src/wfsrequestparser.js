@@ -1872,7 +1872,7 @@ fi.fmi.metoclient.metolib.WfsRequestParser = (function() {
             end = new Date(end);
         }
 
-        // Make sure parameters are available as a single string.
+        // Make sure parameters are available as a single string unless it is null.
         if (requestParameter && _.isArray(requestParameter)) {
             requestParameter = requestParameter.join();
         }
@@ -1886,7 +1886,7 @@ fi.fmi.metoclient.metolib.WfsRequestParser = (function() {
         // Check that required data is available and parameters are of the correct type.
         var urlCheck = url && _.isString(url);
         var storedQueryCheck = storedQueryId && _.isString(storedQueryId);
-        var parameterCheck = requestParameter && _.isString(requestParameter);
+        var parameterCheck = ((requestParameter == null) || requestParameter && _.isString(requestParameter));
         var periodCheck = begin instanceof Date && end instanceof Date && begin.getTime() <= end.getTime() && (!timestep || _.isNumber(timestep) );
         var geoidCheck = _.isNumber(geoid) || geoid && _.isString(geoid) || _.isArray(geoid) && geoid.length;
         var wmoCheck = _.isNumber(wmo) || wmo && _.isString(wmo) || _.isArray(wmo) && wmo.length;
@@ -2014,7 +2014,13 @@ fi.fmi.metoclient.metolib.WfsRequestParser = (function() {
 
             var urlQueryExtension = handleQueryExtension(queryExtension);
 
-            var requestUrl = url + urlQueryDelimiter + myConstants.REQUEST_GET_FEATURE + storedQueryIdParameter + myConstants.REQUEST_PARAMETERS + requestParameter + myConstants.REQUEST_BEGIN + begin + myConstants.REQUEST_END + end + timeStepParameter + geoidParameter + wmoParameter + fmisidParameter + sitesParameter + bboxParameter + crsParameter + urlQueryExtension;
+            //if requestParameters were defined, construct the relevant part for url here. If not, just concat an empty string to the url.
+            var requestParametersUrl = '';
+            if (requestParameter) {
+                requestParametersUrl = myConstants.REQUEST_PARAMETERS + requestParameter;
+            }
+
+            var requestUrl = url + urlQueryDelimiter + myConstants.REQUEST_GET_FEATURE + storedQueryIdParameter + requestParametersUrl + myConstants.REQUEST_BEGIN + begin + myConstants.REQUEST_END + end + timeStepParameter + geoidParameter + wmoParameter + fmisidParameter + sitesParameter + bboxParameter + crsParameter + urlQueryExtension;
             requestAndParseXml(requestUrl, callback);
 
         } else {
@@ -2084,6 +2090,12 @@ fi.fmi.metoclient.metolib.WfsRequestParser = (function() {
                 // Then, later if string or integer values are changed in the function, they are changed
                 // to function variables instead of changing property values of the original object. Notice,
                 // arrays and objects as function parameters still refere to the original arrays and objects.
+
+                //requestParameter is optional but should be passed into getParsedData regardless
+                if (!_.has(options, 'requestParameter')) {
+                    options.requestParameter = null;
+                }
+
                 getParsedData(options.url, options.storedQueryId, options.requestParameter, options.begin, options.end, options.timestep, options.numOfTimesteps, options.denyTimeAdjusting, options.geoid, options.wmo, options.fmisid, options.sites, options.bbox, options.crs, options.queryExtension, function(data, errors) {
                     // Notice, errors parameter is for the errors that occurred during the asynchronous flow.
                     dataCallback(options.callback, data, errors);
