@@ -625,31 +625,6 @@ describe("Parser", function() {
         }, "request and parse operation to finish!", TEST_TIME_OUT);
     });
 
-    /* Test */
-    it("Local data, Helsinki, Turku, all available data without requestParameters defined", function() {
-        var finished = false;
-
-        /* ======================================== */
-        // Start the async call in the first one:
-        runs(function() {
-            try {
-                testHkiTurkuAll(getLocalUrlBase() + "hki_turku_td_ws.xml", function(success) {
-                    expect(success).toBeTruthy();
-                    finished = true;
-                });
-
-            } catch (exception) {
-                finished = true;
-                expect(false).toBeTruthy();
-            }
-        });
-
-        // Wait max secs for all the async calls to finish:
-        waitsFor(function() {
-            return finished;
-        }, "request and parse operation to finish!", TEST_TIME_OUT);
-    });
-
     // Check if test should be run for server data.
     if (!isOnlyLocalTests()) {
         /* ======================================== */
@@ -678,6 +653,31 @@ describe("Parser", function() {
         });
     }
 
+    /* Test */
+    it("Local data, Helsinki, Turku, all available data without requestParameters defined", function() {
+        var finished = false;
+
+        /* ======================================== */
+        // Start the async call in the first one:
+        runs(function() {
+            try {
+                testHkiTurkuAll(getLocalUrlBase() + "hki_turku_td_ws.xml", function(success) {
+                    expect(success).toBeTruthy();
+                    finished = true;
+                });
+
+            } catch (exception) {
+                finished = true;
+                expect(false).toBeTruthy();
+            }
+        });
+
+        // Wait max secs for all the async calls to finish:
+        waitsFor(function() {
+            return finished;
+        }, "request and parse operation to finish!", TEST_TIME_OUT);
+    });
+    
     /* ======================================== */
     it("Local data, Kumpula Helsinki, Turku, td, ws_10min", function() {
         var finished = false;
