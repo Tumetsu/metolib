@@ -760,10 +760,18 @@ fi.fmi.metoclient.metolib.WfsConnection = (function() {
      * See API for function description.
      */
     var retrieveSitesData = function(options) {
-        if (!options.timestep || options.timestep === 1) {
+
+        // requestParameter is optional and might be left out. In that case set null value to be
+        // used by requestParser
+        if (!_.has(options, 'requestParameter')) {
+            options.requestParameter = null;
+        }
+
+        if (!options.timestep || options.timestep === 1 || !options.requestParameter) {
             // Cache requires that timestep is the actual timestep that is used for data.
-            // But, in speacial cases server may use magic numbers to handle data differently.
+            // But, in special cases server may use magic numbers to handle data differently.
             // Cache can not be used with the given options. Therefore, use parser directly.
+            // Cache also requires requestParameter set, so if it was undefined, use parser directly.
             var that = this;
             fi.fmi.metoclient.metolib.WfsRequestParser.getData({
                 url : that.connectionUrl,
