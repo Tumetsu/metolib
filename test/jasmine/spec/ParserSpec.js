@@ -677,6 +677,33 @@ describe("Parser", function() {
             return finished;
         }, "request and parse operation to finish!", TEST_TIME_OUT);
     });
+
+    if (!isOnlyLocalTests()) {
+        /* ======================================== */
+        it("Server data, Helsinki, Turku, all available data without requestParameters defined", function() {
+            var finished = false;
+
+            /* ======================================== */
+            // Start the async call in the first one:
+            runs(function() {
+                try {
+                    testHkiTurkuAll(getSpecRunnerTestServerUrl(), function(success) {
+                        expect(success).toBeTruthy();
+                        finished = true;
+                    });
+
+                } catch (exception) {
+                    finished = true;
+                    expect(false).toBeTruthy();
+                }
+            });
+
+            // Wait max secs for all the async calls to finish:
+            waitsFor(function() {
+                return finished;
+            }, "request and parse operation to finish!", TEST_TIME_OUT);
+        });
+    }
     
     /* ======================================== */
     it("Local data, Kumpula Helsinki, Turku, td, ws_10min", function() {
